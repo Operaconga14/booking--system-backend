@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<body>
+    <style>
+        /* General body styling */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            background-color: #f4f6f8;
+        }
+
+        /* Container for the email */
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Header section */
+        .header {
+            background-color: #3c69fc;
+            color: white;
+            padding: 20px 30px;
+            text-align: center;
+        }
+
+        .header img {
+            width: 80px;
+            height: 80px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 22px;
+        }
+
+        /* Content section */
+        .content {
+            padding: 30px;
+        }
+
+        .content h2 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .content p {
+            color: #525252a6;
+            font-size: 16px;
+            line-height: 1.7;
+        }
+
+        /* Buttons */
+        .button-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .button {
+            display: inline-block;
+            background-color: #3c69fc;
+            color: #ffffff !important;
+            text-decoration: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: #f4f6f8;
+            padding: 15px;
+            text-align: center;
+            font-size: 13px;
+            color: #999;
+        }
+
+        .footer a {
+            color: #3c69fc;
+            text-decoration: none;
+        }
+
+        .footer-note {
+            text-align: center;
+            color: #999;
+            font-size: 13px;
+        }
+
+        /* Optional: Make it responsive */
+        @media only screen and (max-width: 620px) {
+            .container {
+                margin: 20px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .button {
+                padding: 10px 20px;
+            }
+        }
+    </style>
+    <div class='container'>
+        <div class='header'>
+            <div>
+                <svg width="250" height="80" viewBox="0 0 250 80" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Icon -->
+                    <rect x="10" y="15" width="50" height="40" rx="5" fill="white" stroke="#4f46e5" stroke-width="2" />
+                    <rect x="10" y="15" width="50" height="12" fill="#4f46e5" />
+                    <path d="M25 35 L35 42 L45 30" stroke="#10b981" stroke-width="3" stroke-linecap="round"
+                        fill="none" />
+
+                    <!-- Text -->
+                    <text x="75" y="35" font-family="Arial, sans-serif" font-size="20" font-weight="bold"
+                        fill="#1f2937">Booking</text>
+                    <text x="75" y="55" font-family="Arial, sans-serif" font-size="16" fill="#4f46e5">System</text>
+                </svg>
+            </div>
+            <h1>Admin Role Invitation</h1>
+        </div>
+
+        <div class='content'>
+            <h2>Hello {{name}}, 👋</h2>
+            <p>You’ve been invited to join <strong>AllInOne Booking</strong> as an
+                <strong>Admin</strong>. This role grants you access to manage users,
+                bookings, and other administrative settings on the platform. <br><br>
+                Please confirm your invitation by accepting the request below. Once
+                accepted, you’ll be able to log in and start managing the system.
+            </p>
+            <div class='button-container'>
+                <a class='button' href=''>Accept Invitation</a>
+            </div>
+            <div class='footer-note'>
+                If you weren’t expecting this invitation, please ignore this email.
+            </div>
+        </div>
+
+        <div class='footer'>
+            ©{{fullYear}} AllInOne Booking. All rights reserved.<br />
+            <a href='https://allinonebooking.com'>Visit Website</a>
+        </div>
+    </div>
+</body>
+
+</html>
