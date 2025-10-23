@@ -1,5 +1,5 @@
 import { InviteAdminDto } from './dto/invite-admin.dto';
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { UpdateAdminDto } from './dto/update-admin.dto';
 import { MailUtilsService } from 'src/utils/mail-utils.service';
@@ -9,10 +9,13 @@ import { Repository } from 'typeorm';
 import { PasswordUtilsService } from 'src/utils/password-utils.service';
 import { LoginAdminDto } from './dto/login-admin.dto';
 import { TokenUtilsService } from 'src/utils/token-utils.service';
+import { Booking } from 'src/bookings/entities/booking.entity';
 
 @Injectable()
 export class AdminService {
+
     @InjectRepository(User) private readonly userRepo: Repository<User>;
+    @InjectRepository(Booking) private readonly bookingRepo: Repository<Booking>;
 
     constructor(private readonly mailUtilsService: MailUtilsService, private passwordUtilsService: PasswordUtilsService, private tokenUtilsService: TokenUtilsService) { }
 
@@ -67,6 +70,9 @@ export class AdminService {
                 return { message: 'Admin not found' };
             }
 
+            if (admin.role !== 'admin')
+                return { message: 'You are not authorized to login' };
+
             const isPasswordMatched = await this.passwordUtilsService.comparePassword(loginAdminDto.password, admin.password);
 
             if (!isPasswordMatched) {
@@ -96,10 +102,6 @@ export class AdminService {
         } catch (error) {
             return new InternalServerErrorException(error | error.message);
         }
-    }
-
-    update(id: number, updateAdminDto: UpdateAdminDto) {
-        return `This action updates a #${id} admin`;
     }
 
     remove(id: number) {

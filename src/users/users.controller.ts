@@ -18,14 +18,14 @@ export class UsersController {
 
     @UseGuards(AuthGuard, RoleGuard)
     @Roles('user')
-    @Patch(':id')
+    @Patch('update')
     update(@Req() req: any, @Body() updateUserDto: UpdateUserDto) {
         return this.usersService.updateUserdetails(req, updateUserDto);
     }
 
     @UseGuards(AuthGuard, RoleGuard)
     @Roles('user')
-    @Delete(':id')
+    @Delete('delete-account')
     remove(@Req() req: any) {
         return this.usersService.removeUserAccount(req);
     }
