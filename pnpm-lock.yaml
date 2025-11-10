@@ -32,6 +32,9 @@ importers:
       '@nestjs/typeorm':
         specifier: ^11.0.0
         version: 11.0.0(@nestjs/common@11.1.6(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.6)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@0.3.27(mysql2@3.15.2)(pg@8.16.3)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@types/node@22.18.11)(typescript@5.9.3)))
+      '@paystack/paystack-sdk':
+        specifier: ^1.0.1
+        version: 1.0.1
       axios:
         specifier: ^1.12.2
         version: 1.12.2
@@ -944,6 +947,9 @@ packages:
 
   '@paralleldrive/cuid2@2.2.2':
     resolution: {integrity: sha512-ZOBkgDwEdoYVlSeRbYYXs0S9MejQofiVYoTbKzy/6GQa39/q5tQU2IX46+shYnUkpEl3wc+J6wRlar7r2EK2xA==}
+
+  '@paystack/paystack-sdk@1.0.1':
+    resolution: {integrity: sha512-IZT3KI8O6yX+ZFLK2WYq/IjhYduxCWkqh0HesJcSD1TUcHYyoi8iREiM02Qg+nnVCiPaTKdAw7Ogfeg9eVp9wA==}
 
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
@@ -5653,6 +5659,8 @@ snapshots:
   '@paralleldrive/cuid2@2.2.2':
     dependencies:
       '@noble/hashes': 1.8.0
+
+  '@paystack/paystack-sdk@1.0.1': {}
 
   '@pkgjs/parseargs@0.11.0':
     optional: true

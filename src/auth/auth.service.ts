@@ -1,62 +1,110 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { RegisterAuthDto } from './dto/register-auth.dto';
-import { LoginAuthDto } from './dto/login-auth.dto';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/users/entities/user.entity';
+import { UserEntity } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
+import { RegisterAuthDto } from './dto/register-auth.dto';
 import { PasswordUtilsService } from 'src/utils/password-utils.service';
-import { MailUtilsService } from 'src/utils/mail-utils.service';
+import { LoginAuthDto } from './dto/login-auth.dto';
 import { TokenUtilsService } from 'src/utils/token-utils.service';
+import { ResetPasswordInviteDto } from './dto/restetpassword-invite.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Injectable()
 export class AuthService {
-    @InjectRepository(User) private readonly userRepo: Repository<User>;
+    @InjectRepository(UserEntity) private readonly userRepo: Repository<UserEntity>
 
     constructor(
-        private readonly passwordService: PasswordUtilsService,
-        private mailServer: MailUtilsService,
-        private tokenService: TokenUtilsService
+        private readonly passwordUtilsService: PasswordUtilsService,
+        private readonly tokenUtilsService: TokenUtilsService
     ) { }
 
-    async registerUser(registerAuthDto: RegisterAuthDto) {
+    /**
+     * Registration Logic
+     * @param registerAuthDto - inputs from the user
+     * @returns success or error
+     */
+    async userRegistration(registerAuthDto: RegisterAuthDto) {
         try {
-            const existingUser = await this.userRepo.findOne({ where: { email: registerAuthDto.email } });
+            // chkeck if there is an existing user
+            const existingUser = await this.userRepo.findOne({ where: { email: registerAuthDto.email } })
 
-            if (existingUser) {
-                return { message: 'User already exists' };
-            }
+            if (existingUser)
+                return new BadRequestException('User already exists')
 
-            const hashedPassword = await this.passwordService.hashPassword(registerAuthDto.password);
-            registerAuthDto.password = hashedPassword;
+            const hashedPassword = await this.passwordUtilsService.hashPassword(registerAuthDto.password)
+            const newUser = this.userRepo.create({
+                ...registerAuthDto,
+                password: hashedPassword
+            })
+            await this.userRepo.save(newUser)
 
-            const user = this.userRepo.create({
-                ...registerAuthDto
-            });
+            // TODO: Send confirmation email
 
-            await this.userRepo.save(user);
-            const emailServer = await this.mailServer.sendRegistrationMail(registerAuthDto.email, registerAuthDto.name);
-            return emailServer;
-
+            return { message: 'User registered successfully' }
         } catch (error) {
-            return new InternalServerErrorException(error || error.message);
+            return new InternalServerErrorException(error)
         }
-
     }
 
-    async loginUser(loginAuthDto: LoginAuthDto) {
+    /**
+     * Login Logic
+     * @param loginAuthDto - inputs from the user
+     * @returns success or error
+     */
+    async userLogin(loginAuthDto: LoginAuthDto) {
         try {
-            const user = await this.userRepo.findOne({ where: { email: loginAuthDto.email } });
-            if (!user) {
-                return { message: 'User not found' };
-            }
-            const isPasswordMatched = await this.passwordService.comparePassword(loginAuthDto.password, user.password);
-            if (!isPasswordMatched) {
-                return { message: 'Invalid password' };
-            }
-            const token = this.tokenService.generateToken(user);
-            return { message: 'Login successful', token };
+            // Find and check if the user detail is in the database 
+            const user = await this.userRepo.findOne({ where: { email: loginAuthDto.email } })
+
+            if (!user)
+                return new NotFoundException('User doesnt exist')
+
+            // If found  compare password login
+            const matchedPassword = await this.passwordUtilsService.comparePassword(loginAuthDto.password, user.password)
+
+            if (!matchedPassword)
+                return new BadRequestException('Password not correct')
+
+            const token = await this.tokenUtilsService.generateToken(user)
+            return { message: 'Login successful', token }
+
         } catch (error) {
-            return new InternalServerErrorException(error || error.message);
+            return new InternalServerErrorException(error)
         }
+    }
+
+    /**
+     * Send reset password link
+     * @param resetPasswordInviteDto - inputs from the user
+     * @returns success or error
+     */
+    async sendresetLink(resetPasswordInviteDto: ResetPasswordInviteDto) {
+        try {
+            const user = await this.userRepo.findOne({ where: { email: resetPasswordInviteDto.email } })
+
+            if (!user)
+                return new NotFoundException('User does not exist')
+
+            // TODO: send resent link email and generate a token in the details
+
+            return { message: 'Reset link has been sent to your email check your email or your spam folder' }
+
+        } catch (error) {
+            return new InternalServerErrorException(error)
+        }
+    }
+
+    /**
+     * Reset password
+     * @param resetPasswordDto - inputs from the user
+     * @returns success or error
+     */
+    async resetPassword(resetPasswordDto: ResetPasswordDto) {
+        try {
+
+        } catch (error) {
+            return new InternalServerErrorException(error)
+        }
+
     }
 }

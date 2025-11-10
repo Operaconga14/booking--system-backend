@@ -1,16 +1,16 @@
 import { Module } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { AdminController } from './admin.controller';
-import { TokenUtilsService } from 'src/utils/token-utils.service';
-import { MailUtilsService } from 'src/utils/mail-utils.service';
-import { User } from 'src/users/entities/user.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserEntity } from 'src/user/entities/user.entity';
 import { PasswordUtilsService } from 'src/utils/password-utils.service';
-import { Booking } from 'src/bookings/entities/booking.entity';
+import { TokenUtilsService } from 'src/utils/token-utils.service';
+import { AvailabilityEntity } from './entities/availability.entity';
+import { BookingEntity } from 'src/booking/entities/booking.entity';
 
 @Module({
-    controllers: [AdminController],
-    providers: [AdminService, TokenUtilsService, MailUtilsService, PasswordUtilsService],
-    imports: [TypeOrmModule.forFeature([User, Booking])],
+  controllers: [AdminController],
+  providers: [AdminService, PasswordUtilsService, TokenUtilsService],
+  imports: [TypeOrmModule.forFeature([UserEntity, AvailabilityEntity, BookingEntity])]
 })
 export class AdminModule { }
