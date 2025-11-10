@@ -4,7 +4,7 @@ import { AuthModule } from './auth/auth.module';
 import { BookingModule } from './booking/booking.module';
 import { TransactionModule } from './transaction/transaction.module';
 import { UserModule } from './user/user.module';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
@@ -12,22 +12,24 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     ConfigModule.forRoot({
       isGlobal: true
     }),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      synchronize: false,
-      host: process.env.DB_HOST,
-      port: Number(process.env.DB_PORT),
-      username: process.env.DB_USERNAME,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
-      entities: [],
-      autoLoadEntities: true,
-      ssl: {
-        rejectUnauthorized: false
-      },
-      extra: {
-        max: 1
-      }
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        type: 'postgres',
+        synchronize: false,
+        host: config.get('DB_HOST'),
+        port: Number(config.get('DB_PORT')),
+        username: config.get('DB_USERNAME'),
+        password: config.get('DB_PASSWORD'),
+        database: config.get('DB_NAME'),
+        entities: [],
+        autoLoadEntities: true,
+        ssl: { rejectUnauthorized: false },
+        extra: {
+          max: 1
+        }
+      })
     })
     ,
     AdminModule, AuthModule, BookingModule, TransactionModule, UserModule],
