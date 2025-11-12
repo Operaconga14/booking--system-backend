@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+    <style>
+        body{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        .container{
+           background-color: blueviolet;
+           padding: 20px;
+           border-radius: 10px;
+           width: 100%;        /* always fill the screen width */
+           max-width: 500px;   /* but don’t exceed 900px on big screens */
+           min-width: 400px;
+           margin: 0 auto;     /* center it when larger screens */
+           box-sizing: border-box;
+        }
+    </style>
+<body>
+    <div class="container">
+        Hello {{name}}
+        <p>Thank you for registering on our platform. We are excited to have you on board!</p>
+        <p>Best regards, <br> Booking System Team</p>
+    </div>
+</body>
+</html>

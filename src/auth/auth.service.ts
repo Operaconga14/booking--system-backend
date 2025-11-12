@@ -1,26 +1,110 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { UserEntity } from 'src/user/entities/user.entity';
+import { Repository } from 'typeorm';
+import { RegisterAuthDto } from './dto/register-auth.dto';
+import { PasswordUtilsService } from 'src/utils/password-utils.service';
+import { LoginAuthDto } from './dto/login-auth.dto';
+import { TokenUtilsService } from 'src/utils/token-utils.service';
+import { ResetPasswordInviteDto } from './dto/restetpassword-invite.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
-  }
+    @InjectRepository(UserEntity) private readonly userRepo: Repository<UserEntity>
 
-  findAll() {
-    return `This action returns all auth`;
-  }
+    constructor(
+        private readonly passwordUtilsService: PasswordUtilsService,
+        private readonly tokenUtilsService: TokenUtilsService
+    ) { }
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
+    /**
+     * Registration Logic
+     * @param registerAuthDto - inputs from the user
+     * @returns success or error
+     */
+    async userRegistration(registerAuthDto: RegisterAuthDto) {
+        try {
+            // chkeck if there is an existing user
+            const existingUser = await this.userRepo.findOne({ where: { email: registerAuthDto.email } })
 
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
+            if (existingUser)
+                return new BadRequestException('User already exists')
 
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
-  }
+            const hashedPassword = await this.passwordUtilsService.hashPassword(registerAuthDto.password)
+            const newUser = this.userRepo.create({
+                ...registerAuthDto,
+                password: hashedPassword
+            })
+            await this.userRepo.save(newUser)
+
+            // TODO: Send confirmation email
+
+            return { message: 'User registered successfully' }
+        } catch (error) {
+            return new InternalServerErrorException(error)
+        }
+    }
+
+    /**
+     * Login Logic
+     * @param loginAuthDto - inputs from the user
+     * @returns success or error
+     */
+    async userLogin(loginAuthDto: LoginAuthDto) {
+        try {
+            // Find and check if the user detail is in the database 
+            const user = await this.userRepo.findOne({ where: { email: loginAuthDto.email } })
+
+            if (!user)
+                return new NotFoundException('User doesnt exist')
+
+            // If found  compare password login
+            const matchedPassword = await this.passwordUtilsService.comparePassword(loginAuthDto.password, user.password)
+
+            if (!matchedPassword)
+                return new BadRequestException('Password not correct')
+
+            const token = await this.tokenUtilsService.generateToken(user)
+            return { message: 'Login successful', token }
+
+        } catch (error) {
+            return new InternalServerErrorException(error)
+        }
+    }
+
+    /**
+     * Send reset password link
+     * @param resetPasswordInviteDto - inputs from the user
+     * @returns success or error
+     */
+    async sendresetLink(resetPasswordInviteDto: ResetPasswordInviteDto) {
+        try {
+            const user = await this.userRepo.findOne({ where: { email: resetPasswordInviteDto.email } })
+
+            if (!user)
+                return new NotFoundException('User does not exist')
+
+            // TODO: send resent link email and generate a token in the details
+
+            return { message: 'Reset link has been sent to your email check your email or your spam folder' }
+
+        } catch (error) {
+            return new InternalServerErrorException(error)
+        }
+    }
+
+    /**
+     * Reset password
+     * @param resetPasswordDto - inputs from the user
+     * @returns success or error
+     */
+    async resetPassword(resetPasswordDto: ResetPasswordDto) {
+        try {
+
+        } catch (error) {
+            return new InternalServerErrorException(error)
+        }
+
+    }
 }

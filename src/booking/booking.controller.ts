@@ -1,34 +1,44 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
 import { BookingService } from './booking.service';
+import { Roles } from 'src/decorators/role.decorator';
+import { AuthGuard } from 'src/guards/auth.guard';
+import { RoleGuard } from 'src/guards/role.guard';
 import { CreateBookingDto } from './dto/create-booking.dto';
-import { UpdateBookingDto } from './dto/update-booking.dto';
 
 @Controller('booking')
 export class BookingController {
-  constructor(private readonly bookingService: BookingService) {}
+  constructor(private readonly bookingService: BookingService) { }
 
-  @Post()
-  create(@Body() createBookingDto: CreateBookingDto) {
-    return this.bookingService.create(createBookingDto);
+  /**
+   * -------------------------------------------------------------
+   *                    USER BOOKING MANAGMENT
+   * -------------------------------------------------------------
+   */
+
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles('user')
+  @Post('create')
+  createBooking(@Req() req: any, @Body() createBookingDto: CreateBookingDto) {
+    return this.bookingService.createBooking(req, createBookingDto)
   }
 
-  @Get()
-  findAll() {
-    return this.bookingService.findAll();
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles('user')
+  @Delete('delete/:id')
+  deleteBooking(@Req() req: any, @Param('id') id: number) {
+    return this.bookingService.deleteBooking(req, id)
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.bookingService.findOne(+id);
-  }
+  /**
+   * -------------------------------------------------------------
+   *                    USER AVAILABILITY MANAGMENT
+   * -------------------------------------------------------------
+   */
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateBookingDto: UpdateBookingDto) {
-    return this.bookingService.update(+id, updateBookingDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.bookingService.remove(+id);
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles('user')
+  @Get('availabilities')
+  availbilities() {
+    return this.bookingService.getAllAvalability()
   }
 }

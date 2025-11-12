@@ -1,34 +1,25 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, Query } from '@nestjs/common';
 import { TransactionService } from './transaction.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
-import { UpdateTransactionDto } from './dto/update-transaction.dto';
+import { RoleGuard } from 'src/guards/role.guard';
+import { AuthGuard } from 'src/guards/auth.guard';
+import { Roles } from 'src/decorators/role.decorator';
 
 @Controller('transaction')
 export class TransactionController {
-  constructor(private readonly transactionService: TransactionService) {}
+  constructor(private readonly transactionService: TransactionService) { }
 
-  @Post()
-  create(@Body() createTransactionDto: CreateTransactionDto) {
-    return this.transactionService.create(createTransactionDto);
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles('user')
+  @Post('make-payment')
+  pay(@Req() req: any, @Body() createTransactionDto: CreateTransactionDto) {
+    return this.transactionService.makePayment(req, createTransactionDto)
   }
 
-  @Get()
-  findAll() {
-    return this.transactionService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.transactionService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTransactionDto: UpdateTransactionDto) {
-    return this.transactionService.update(+id, updateTransactionDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.transactionService.remove(+id);
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles('user')
+  @Get('verify-payment')
+  verify(@Query('reference') reference: string) {
+    return this.transactionService.verifyPayment(reference)
   }
 }
