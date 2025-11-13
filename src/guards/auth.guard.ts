@@ -6,6 +6,11 @@ import { TokenUtilsService } from 'src/utils/token.utils.service';
 export class AuthGuard implements CanActivate {
   constructor(private readonly tokenService: TokenUtilsService) { }
 
+  /**
+   * 
+   * @param context - Execution context containing request and metadata
+   * @returns - Boolean indicating if access is granted
+   */
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
