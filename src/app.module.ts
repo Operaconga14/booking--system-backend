@@ -2,6 +2,9 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user/user.module';
+import { UserEntity } from './user/entities/user.entity';
+import { PasswordUtilsService } from './utils/password.utils.service';
 
 @Module({
   imports: [
@@ -19,7 +22,7 @@ import { AuthModule } from './auth/auth.module';
         username: config.get('DB_USERNAME'),
         password: config.get('DB_PASSWORD'),
         database: config.get('DB_NAME'),
-        entities: [],
+        entities: [UserEntity],
         autoLoadEntities: true,
         ssl: { rejectUnauthorized: false },
         extra: {
@@ -27,9 +30,10 @@ import { AuthModule } from './auth/auth.module';
         }
       })
     }),
-    AuthModule
+    AuthModule,
+    UserModule
   ],
   controllers: [],
-  providers: [],
+  providers: [PasswordUtilsService],
 })
 export class AppModule { }

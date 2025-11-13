@@ -1,26 +1,40 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { RegisterAuthDto } from './dto/register-auth.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { UserEntity } from 'src/user/entities/user.entity';
+import { Repository } from 'typeorm';
+import { PasswordUtilsService } from 'src/utils/password.utils.service';
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
+  @InjectRepository(UserEntity)
+  private readonly userRepo: Repository<UserEntity>
+
+  constructor(private readonly passwordService: PasswordUtilsService) { }
+
+  async registerUser(registerDto: RegisterAuthDto) {
+    try {
+      const existingUser = await this.userRepo.findOne({ where: { email: registerDto.email } })
+
+      if (existingUser)
+        throw new BadRequestException('User already exists')
+
+      const hashedPassword = await this.passwordService.hashPassword(registerDto.password)
+
+      const newUser = this.userRepo.create({
+        ...registerDto,
+        password: hashedPassword
+      })
+
+      await this.userRepo.save(newUser)
+
+      // Send Email
+
+      return { message: 'User registered successfully' }
+    } catch (error) {
+      throw new InternalServerErrorException(error)
+    }
+
   }
 
-  findAll() {
-    return `This action returns all auth`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
-
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
-  }
 }
