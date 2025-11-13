@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { UserEntity } from 'src/user/entities/user.entity';
 import { verify, sign } from 'jsonwebtoken';
 import { ConfigService } from '@nestjs/config';
@@ -10,6 +10,9 @@ export class TokenUtilsService {
     constructor(configService: ConfigService) {
         // Load JWT secret from environment variables
         this.JWT_SECRET = configService.get<string>('JWT_SECRET')!;
+
+        if (!this.JWT_SECRET)
+            throw new InternalServerErrorException('JWT_SECRET is not defined');
     }
 
     /**
@@ -24,10 +27,6 @@ export class TokenUtilsService {
             role: user.role
         };
 
-        if (!this.JWT_SECRET)
-            throw new Error('JWT_SECRET is not defined');
-
-        // Sign and return token with 1 day expiration
         const token = sign(payload, this.JWT_SECRET, { expiresIn: '1d' });
         return token;
     }
@@ -38,14 +37,10 @@ export class TokenUtilsService {
      */
     verifyToken(token: string) {
         try {
-            if (!this.JWT_SECRET)
-                throw new Error('JWT_SECRET is not defined');
-
-            // Verify signature and decode token
             const decode = verify(token, this.JWT_SECRET);
             return decode;
         } catch (error) {
-            throw new Error('Token verification failed: ' + error.message);
+            throw new UnauthorizedException(error);
         }
     }
 }
