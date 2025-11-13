@@ -1,11 +1,7 @@
 import { Module } from '@nestjs/common';
-import { AdminModule } from './admin/admin.module';
-import { AuthModule } from './auth/auth.module';
-import { BookingModule } from './booking/booking.module';
-import { TransactionModule } from './transaction/transaction.module';
-import { UserModule } from './user/user.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -30,9 +26,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
           max: 1
         }
       })
-    })
-    ,
-    AdminModule, AuthModule, BookingModule, TransactionModule, UserModule],
+    }),
+    AuthModule
+  ],
   controllers: [],
   providers: [],
 })
