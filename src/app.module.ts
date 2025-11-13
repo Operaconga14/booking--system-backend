@@ -5,6 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { UserEntity } from './user/entities/user.entity';
 import { PasswordUtilsService } from './utils/password.utils.service';
+import { TokenUtilsService } from './utils/token.utils.service';
 
 @Module({
   imports: [
@@ -34,6 +35,6 @@ import { PasswordUtilsService } from './utils/password.utils.service';
     UserModule
   ],
   controllers: [],
-  providers: [PasswordUtilsService],
+  providers: [PasswordUtilsService, TokenUtilsService],
 })
 export class AppModule { }
