@@ -47,6 +47,11 @@ export class AuthService {
 
   }
 
+  /**
+   * 
+   * @param loginDto - user email and pasword
+   * @returns - success or error message and token
+   */
   async loginUser(loginDto: LoginAuthDto) {
     try {
       const user = await this.userRepo.findOne({ where: { email: loginDto.email } })

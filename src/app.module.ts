@@ -6,6 +6,7 @@ import { UserModule } from './user/user.module';
 import { UserEntity } from './user/entities/user.entity';
 import { PasswordUtilsService } from './utils/password.utils.service';
 import { TokenUtilsService } from './utils/token.utils.service';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -32,7 +33,8 @@ import { TokenUtilsService } from './utils/token.utils.service';
       })
     }),
     AuthModule,
-    UserModule
+    UserModule,
+    AdminModule
   ],
   controllers: [],
   providers: [PasswordUtilsService, TokenUtilsService],

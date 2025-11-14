@@ -32,16 +32,19 @@ export class RoleGuard implements CanActivate {
     if (!user)
       throw new ForbiddenException('You do not have access to this resource');
 
+    const adminRoles = ['admin', 'ceo', 'manager', 'receptionist']
+    const isAdmin = adminRoles.includes(user.role)
     const hasRequiredRole = requiredRoles.includes(user.role);
 
     if (!hasRequiredRole) {
-      if (user.role === 'admin' && requiredRoles.includes('user')) {
+      if (isAdmin && requiredRoles.includes('user'))
         throw new ForbiddenException('Admin is rejected from accessing user role');
-      } else if (user.role !== 'admin' && requiredRoles.includes('admin')) {
+
+      if (!isAdmin && requiredRoles.some(r => adminRoles.includes(r))) {
         throw new ForbiddenException('User is not an admin');
-      } else {
-        throw new ForbiddenException('You do not have access to this resource');
       }
+
+      throw new ForbiddenException('You do not have access to this resource');
     }
 
     return true;
