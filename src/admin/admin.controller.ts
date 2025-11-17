@@ -1,7 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { AdminRegisterDto } from './dto/admin-register.dto';
 import { AdminLoginDto } from './dto/admin-login.dto';
+import { AuthGuard } from 'src/guards/auth.guard';
+import { RoleGuard } from 'src/guards/role.guard';
+import { Roles } from 'src/decorators/role.decorator';
 
 @Controller('admin')
 export class AdminController {
@@ -29,5 +32,12 @@ export class AdminController {
    *                ADMIN MANAGMENT
    * --------------------------------------------------------
    */
+
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles('admin', 'ceo', 'manager')
+  @Get('all-admins')
+  allAdmins() {
+    return this.adminService.getAllAdmins()
+  }
 
 }

@@ -17,10 +17,10 @@ export class AdminService {
   ) { }
 
   /**
-     * ----------------------------------------------
-     *              ADMIN AUTH MANAGMENT
-     * ----------------------------------------------
-     */
+   * ----------------------------------------------
+   *              ADMIN AUTH MANAGMENT
+   * ----------------------------------------------
+   */
 
   /**
    *  Self registration Logic
@@ -70,6 +70,25 @@ export class AdminService {
       return { message: 'Login successful', token }
     } catch (error) {
       return new InternalServerErrorException(error)
+    }
+  }
+
+  /**
+    * ----------------------------------------------
+    *              ADMIN MANAGMENT
+    * ----------------------------------------------
+  */
+
+  async getAllAdmins() {
+    try {
+      const admins = await this.userRepo.find({ where: { role: In(['admin', 'ceo', 'manager', 'receptionist']) }, select: ['id', 'name', 'email', 'role', 'createdAt', 'updatedAt'] })
+
+      if (!admins)
+        throw new BadRequestException('No admins found')
+
+      return admins
+    } catch (error) {
+      throw new InternalServerErrorException(error)
     }
   }
 
