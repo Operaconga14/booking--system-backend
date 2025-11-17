@@ -24,4 +24,10 @@ export class AdminController {
     return this.adminService.adminLogin(adminLoginDto)
   }
 
+  /**
+   * --------------------------------------------------------
+   *                ADMIN MANAGMENT
+   * --------------------------------------------------------
+   */
+
 }
