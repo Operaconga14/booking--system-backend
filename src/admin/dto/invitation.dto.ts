@@ -1,5 +1,5 @@
 import { IsIn, IsNotEmpty } from "class-validator";
-import { UserRole } from "src/enums/UserRole.enum";
+import { UserRole } from "../../enums/UserRole.enum";
 
 export class InvitationDto {
     @IsNotEmpty({ message: 'Name is required' })
