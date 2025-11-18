@@ -6,8 +6,9 @@ import { TokenUtilsService } from 'src/utils/token.utils.service';
 import { In, Repository } from 'typeorm';
 import { AdminRegisterDto } from './dto/admin-register.dto';
 import { AdminLoginDto } from './dto/admin-login.dto';
-import { RemoveAdminDto } from './dto/remove-admin.dto';
 import { InvitationDto } from './dto/invitation.dto';
+import { ChangeAdminRoleDto } from './dto/change-admin-role.dto';
+import { RemoveAdminDto } from './dto/remove-admin.dto';
 
 @Injectable()
 export class AdminService {
@@ -99,21 +100,21 @@ export class AdminService {
     }
   }
 
-  // async removeAdmin(name: string) {
-  //   try {
-  //     const admin = await this.userRepo.findOne({ where: { name, role: In(['admin', 'ceo', 'manager', 'receptionist']) } })
+  async removeAdmin(removeAdminDto: RemoveAdminDto) {
+    try {
+      const admin = await this.userRepo.findOne({ where: { name: removeAdminDto.name, role: In(['admin', 'ceo', 'manager', 'receptionist']) } })
 
-  //     if (!admin)
-  //       throw new NotFoundException(`Admin with name ${name} not found`)
+      if (!admin)
+        throw new NotFoundException(`Admin with name ${removeAdminDto.name} not found`)
 
-  //     // TODO: Send email to the admin and the removed admin
+      // TODO: Send email to the admin and the removed admin
 
-  //     await this.userRepo.remove(admin)
-  //     return { message: 'Admin removed successfully' }
-  //   } catch (error) {
-  //     throw new InternalServerErrorException(error)
-  //   }
-  // }
+      await this.userRepo.remove(admin)
+      return { message: 'Admin removed successfully' }
+    } catch (error) {
+      throw new InternalServerErrorException(error)
+    }
+  }
 
   /**
    * 
@@ -130,6 +131,24 @@ export class AdminService {
 
       // TODO: Send invitation email to the admin
       return { message: 'Invitation sent successfully' }
+    } catch (error) {
+      throw new InternalServerErrorException(error)
+    }
+  }
+
+  async changeAdminRole(changeAdminRole: ChangeAdminRoleDto) {
+    try {
+      const admin = await this.userRepo.findOne({ where: { name: changeAdminRole.name, role: In(['admin', 'ceo', 'manager', 'receptionist']) } })
+
+      if (!admin)
+        throw new BadRequestException('Admin not found')
+
+      admin.role = changeAdminRole.role
+
+      // TODO: Send email to the admin and the changed admin
+
+      await this.userRepo.save(admin)
+      return { message: 'Admin role changed successfully' }
     } catch (error) {
       throw new InternalServerErrorException(error)
     }
