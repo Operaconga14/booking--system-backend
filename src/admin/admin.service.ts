@@ -9,10 +9,13 @@ import { AdminLoginDto } from './dto/admin-login.dto';
 import { InvitationDto } from './dto/invitation.dto';
 import { ChangeAdminRoleDto } from './dto/change-admin-role.dto';
 import { RemoveAdminDto } from './dto/remove-admin.dto';
+import { CreateAvailabilityDto } from './dto/create-availability.dto';
+import { AvailabilityEntity } from 'src/booking/entities/availability.entity';
 
 @Injectable()
 export class AdminService {
   @InjectRepository(UserEntity) private readonly userRepo: Repository<UserEntity>
+  @InjectRepository(AvailabilityEntity) private readonly availabilityRepo: Repository<AvailabilityEntity>
 
   constructor(
     private readonly passwordService: PasswordUtilsService,
@@ -101,6 +104,24 @@ export class AdminService {
   }
 
   /**
+   * Get admin by name
+   * @param name - admin name to be searched
+   * @returns - admin or error message
+   */
+  async getAdminByName(name: string) {
+    try {
+      const admin = await this.userRepo.findOne({ where: { name: name, role: In(['admin', 'ceo', 'manager', 'receptionist']) }, select: ["id", 'name', 'email', 'role', 'createdAt', 'updatedAt'] })
+
+      if (!admin)
+        throw new NotFoundException(`Admin with name ${name} not found`)
+
+      return admin
+    } catch (error) {
+      throw new InternalServerErrorException(error)
+    }
+  }
+
+  /**
    * Remove admin
    * @param removeAdminDto - admin name
    * @returns - success or error message
@@ -160,6 +181,46 @@ export class AdminService {
 
       await this.userRepo.save(admin)
       return { message: 'Admin role changed successfully' }
+    } catch (error) {
+      throw new InternalServerErrorException(error)
+    }
+  }
+
+
+  /**
+   * ----------------------------------------------------
+   *              AVAILABILITY MANAGMENT
+   * ----------------------------------------------------
+   */
+
+  async createAvailability(createAvailabilityDto: CreateAvailabilityDto) {
+    try {
+      const existingAvailability = await this.availabilityRepo.findOne({ where: { date: createAvailabilityDto.date, time: createAvailabilityDto.time } })
+
+      if (existingAvailability)
+        throw new BadRequestException('Availability already exists')
+
+      const newAvailability = this.availabilityRepo.create({
+        ...createAvailabilityDto
+      })
+
+      await this.availabilityRepo.save(newAvailability)
+
+      // TODO: Send email to the admin
+      return { message: 'Availability created successfully' }
+    } catch (error) {
+      throw new InternalServerErrorException(error)
+    }
+  }
+
+  async getAllAvailabilities() {
+    try {
+      const availabilities = await this.availabilityRepo.find()
+
+      if (availabilities.length <= 0)
+        throw new NotFoundException('No availabilities created')
+
+      return availabilities
     } catch (error) {
       throw new InternalServerErrorException(error)
     }

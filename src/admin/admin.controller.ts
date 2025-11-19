@@ -8,6 +8,7 @@ import { Roles } from 'src/decorators/role.decorator';
 import { InvitationDto } from './dto/invitation.dto';
 import { ChangeAdminRoleDto } from './dto/change-admin-role.dto';
 import { RemoveAdminDto } from './dto/remove-admin.dto';
+import { CreateAvailabilityDto } from './dto/create-availability.dto';
 
 @Controller('admin')
 export class AdminController {
@@ -45,7 +46,14 @@ export class AdminController {
 
   @UseGuards(AuthGuard, RoleGuard)
   @Roles('admin', 'ceo', 'manager')
-  @Delete('remove-admin/:name')
+  @Get('admin-by-name/:name')
+  adminByName(@Param('name') name: string) {
+    return this.adminService.getAdminByName(name)
+  }
+
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles('admin', 'ceo', 'manager')
+  @Delete('remove-admin')
   removeAdmin(@Body() removeAdminDto: RemoveAdminDto) {
     return this.adminService.removeAdmin(removeAdminDto)
   }
@@ -62,6 +70,27 @@ export class AdminController {
   @Patch('change-admin-role')
   changeAdminRole(@Body() changeAdminRoleDto: ChangeAdminRoleDto) {
     return this.adminService.changeAdminRole(changeAdminRoleDto)
+  }
+
+
+  /**
+   * --------------------------------------------------------
+   *                AVAILABILITY MANAGMENT
+   * --------------------------------------------------------
+   */
+
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles('admin', 'ceo', 'manager', 'receptionist')
+  @Post('create-availability')
+  createAvailability(@Body() createAvailabilityDto: CreateAvailabilityDto) {
+    return this.adminService.createAvailability(createAvailabilityDto)
+  }
+
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles('admin', 'ceo', 'manager', 'receptionist')
+  @Get('all-availabilities')
+  allAvailabilities() {
+    return this.adminService.getAllAvailabilities()
   }
 
 }
