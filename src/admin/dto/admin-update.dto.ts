@@ -1,4 +1,5 @@
-import { IsOptional } from "class-validator";
+import { IsIn, IsOptional } from "class-validator";
+import { UserRole } from "../../enums/UserRole.enum";
 
 export class AdminUpdateDto {
     @IsOptional()
@@ -8,5 +9,6 @@ export class AdminUpdateDto {
     email: string
 
     @IsOptional()
+    @IsIn(Object.values(UserRole), { message: 'Invalid role' })
     role: string
 }

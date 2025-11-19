@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, InternalServerErrorException, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, InternalServerErrorException, BadRequestException, Req } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { AdminRegisterDto } from './dto/admin-register.dto';
 import { AdminLoginDto } from './dto/admin-login.dto';
@@ -14,6 +14,7 @@ import { UpdateBookingStatusDto } from './dto/update-booking-status.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from 'src/user/entities/user.entity';
 import { In, Repository } from 'typeorm';
+import { AdminUpdateDto } from './dto/admin-update.dto';
 
 @Controller('admin')
 export class AdminController {
@@ -204,5 +205,26 @@ export class AdminController {
    *               PERSONAL ADMIN ACCOUNT MANAGMENT
    * --------------------------------------------------------
    */
+
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles('admin', 'ceo', 'manager', 'receptionist')
+  @Get('get-details')
+  getDetails(@Req() req: any) {
+    return this.adminService.getAdminDetails(req)
+  }
+
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles('admin', 'ceo', 'manager', 'receptionist')
+  @Patch('update-account')
+  updateAccount(@Req() req: any, @Body() updateAccountDto: AdminUpdateDto) {
+    return this.adminService.updateAccount(req, updateAccountDto)
+  }
+
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles('admin', 'ceo', 'manager', 'receptionist')
+  @Delete('delete-account')
+  deleteAccount(@Req() req: any) {
+    return this.adminService.deleteAccount(req)
+  }
 
 }

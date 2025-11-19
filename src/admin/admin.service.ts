@@ -488,11 +488,47 @@ export class AdminService {
    * -----------------------------------------------------------
    */
 
-  async getDetails(req: any) {
+  async getAdminDetails(req: any) {
+    try {
+      const adminId = req.user.id
+      const admin = await this.userRepo.findOne({ where: { id: parseInt(adminId) }, select: ['id', 'name', 'email', 'createdAt', 'updatedAt'] })
 
+      return admin
+    } catch (error) {
+      throw new InternalServerErrorException(error)
+    }
   }
 
-  async updateAccount(req: any, updateAccountDto: AdminUpdateDto) { }
+  async updateAccount(req: any, updateAccountDto: AdminUpdateDto) {
+    try {
+      const admin = await this.userRepo.findOne({ where: { id: req.user.id, role: In(['admin', 'ceo', 'manager', 'receptionist']) }, select: ['name', 'email', 'createdAt', 'updatedAt'] })
 
-  async deleteAccount(req: any) { }
+      if (!admin)
+        throw new NotFoundException('Admin not found')
+
+      await this.userRepo.update(req.user.id, updateAccountDto)
+
+      //  TODO SEND EMAIL TO THE ADMIN
+
+      return { message: 'Admin updated successfully' }
+    } catch (error) {
+      throw new InternalServerErrorException(error)
+    }
+  }
+
+  async deleteAccount(req: any) {
+    try {
+      const admin = await this.userRepo.findOne({ where: { id: req.user.id, role: In(['admin', 'ceo', 'manager', 'receptionist']) }, select: ['id', 'name', 'email', 'createdAt', 'updatedAt'] })
+
+      if (!admin)
+        throw new NotFoundException('Admin not found')
+
+      await this.userRepo.remove(admin)
+
+      // TODO: Send email to the admin
+      return { message: 'Admin deleted successfully' }
+    } catch (error) {
+      throw new InternalServerErrorException(error)
+    }
+  }
 }
