@@ -20,7 +20,7 @@ async function bootstrap() {
     .setTitle('Booking System API')
     .setDescription('Booking System API')
     .setVersion('1.0')
-    .addServer('http://localhost:3000/api/v1')
+    .addServer("https://bookingsystemapi.vercel.app/api/v1")
     .addOAuth2({
       type: 'http',
       scheme: 'bearer',
