@@ -9,6 +9,7 @@ import { InvitationDto } from './dto/invitation.dto';
 import { ChangeAdminRoleDto } from './dto/change-admin-role.dto';
 import { RemoveAdminDto } from './dto/remove-admin.dto';
 import { CreateAvailabilityDto } from './dto/create-availability.dto';
+import { UpdateAvailabilityDto } from './dto/update-availability.dto';
 
 @Controller('admin')
 export class AdminController {
@@ -91,6 +92,20 @@ export class AdminController {
   @Get('all-availabilities')
   allAvailabilities() {
     return this.adminService.getAllAvailabilities()
+  }
+
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles('admin', 'ceo', 'manager', 'receptionist')
+  @Patch('update-availability/:id')
+  updateAvailability(@Param('id') id: string, @Body() updateAvailabilityDto: UpdateAvailabilityDto) {
+    return this.adminService.updateAvailability(id, updateAvailabilityDto)
+  }
+
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles('admin', 'ceo', 'manager', 'receptionist')
+  @Delete('delete-availability/:id')
+  deleteAvailability(@Param('id') id: string) {
+    return this.adminService.deleteAvailability(id)
   }
 
 }

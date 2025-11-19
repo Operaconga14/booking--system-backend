@@ -11,6 +11,7 @@ import { ChangeAdminRoleDto } from './dto/change-admin-role.dto';
 import { RemoveAdminDto } from './dto/remove-admin.dto';
 import { CreateAvailabilityDto } from './dto/create-availability.dto';
 import { AvailabilityEntity } from 'src/booking/entities/availability.entity';
+import { UpdateAvailabilityDto } from './dto/update-availability.dto';
 
 @Injectable()
 export class AdminService {
@@ -193,6 +194,12 @@ export class AdminService {
    * ----------------------------------------------------
    */
 
+  /**
+   * Create availability
+   * @param createAvailabilityDto - availability date and time
+   * @returns - success or error message
+   */
+
   async createAvailability(createAvailabilityDto: CreateAvailabilityDto) {
     try {
       const existingAvailability = await this.availabilityRepo.findOne({ where: { date: createAvailabilityDto.date, time: createAvailabilityDto.time } })
@@ -213,6 +220,10 @@ export class AdminService {
     }
   }
 
+  /**
+   * Get all availabilities
+   * @returns - all availabilities
+   */
   async getAllAvailabilities() {
     try {
       const availabilities = await this.availabilityRepo.find()
@@ -226,5 +237,48 @@ export class AdminService {
     }
   }
 
+  async updateAvailability(id: string, updateAvailabilityDto: UpdateAvailabilityDto) {
+    try {
+      const availability = await this.availabilityRepo.findOne({ where: { id: parseInt(id) } })
+
+      if (!availability)
+        throw new NotFoundException('Availability not found')
+
+      await this.availabilityRepo.update(id, updateAvailabilityDto)
+
+      //  TODO: Send email to the admin
+      return { message: 'Availability updated successfully' }
+    } catch (error) {
+      throw new InternalServerErrorException(error)
+    }
+  }
+
+  /**
+   * Delete availability
+   * @param id - availabilty id
+   * @returns - success or error message
+   */
+  async deleteAvailability(id: string) {
+    try {
+      const availability = await this.availabilityRepo.findOne({ where: { id: parseInt(id) } })
+
+      if (!availability)
+        throw new NotFoundException('Availability not found')
+
+      await this.availabilityRepo.remove(availability)
+
+      // TODO: Send email to the admin
+      return { message: 'Availability deleted successfully' }
+    } catch (error) {
+      throw new InternalServerErrorException(error)
+    }
+  }
+
+
+  /**
+   * ----------------------------------------------------------
+   *              BOOKING MANAGMENT
+   * ----------------------------------------------------------
+   */
 
 }
