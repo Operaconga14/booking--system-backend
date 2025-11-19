@@ -10,6 +10,7 @@ import { ChangeAdminRoleDto } from './dto/change-admin-role.dto';
 import { RemoveAdminDto } from './dto/remove-admin.dto';
 import { CreateAvailabilityDto } from './dto/create-availability.dto';
 import { UpdateAvailabilityDto } from './dto/update-availability.dto';
+import { UpdateBookingStatusDto } from './dto/update-booking-status.dto';
 
 @Controller('admin')
 export class AdminController {
@@ -107,5 +108,63 @@ export class AdminController {
   deleteAvailability(@Param('id') id: string) {
     return this.adminService.deleteAvailability(id)
   }
+
+  /**
+   * --------------------------------------------------------
+   *               BOOKING MANAGMENT
+   * --------------------------------------------------------
+   */
+
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles('admin', 'ceo', 'manager', 'receptionist')
+  @Get('all-bookings')
+  getAllBookings() {
+    return this.adminService.getAllBookings()
+  }
+
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles('admin', 'ceo', 'manager', 'receptionist')
+  @Get('booking-by-id/:id')
+  getBookingById(@Param('id') id: string) {
+    return this.adminService.getBookingById(id)
+  }
+
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles('admin', 'ceo', 'manager', 'receptionist')
+  @Get('booking-by-user/:id')
+  getBookingByUserId(@Param('id') id: string) {
+    return this.adminService.getBookingByUserId(id)
+  }
+
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles('admin', 'ceo', 'manager', 'receptionist')
+  @Patch('update-booking-status/:id')
+  updateBookingStatus(@Param('id') id: string, @Body() updateBookingStatusDto: UpdateBookingStatusDto) {
+    return this.adminService.updateBookingStatus(id, updateBookingStatusDto)
+  }
+
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles('admin', 'ceo', 'manager', 'receptionist')
+  @Delete('delete-booking/:id')
+  deleteBooking(@Param('id') id: string) {
+    return this.adminService.deleteBooking(id)
+  }
+
+
+
+
+  /**
+   * --------------------------------------------------------
+   *               USER MANAGMENT
+   * --------------------------------------------------------
+   */
+
+
+
+  /**
+   * --------------------------------------------------------
+   *               PERSONAL ADMIN ACCOUNT MANAGMENT
+   * --------------------------------------------------------
+   */
 
 }

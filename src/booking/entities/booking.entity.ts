@@ -1,6 +1,7 @@
 import { UserEntity } from "src/user/entities/user.entity";
-import { Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { AvailabilityEntity } from "./availability.entity";
+import * as bookingTypes from "src/types/booking.types";
 
 @Entity('bookings')
 export class BookingEntity {
@@ -36,7 +37,7 @@ export class BookingEntity {
      * - postponed: Booking rescheduled to a different date
      */
     @Column({ type: 'enum', enum: ['pending', 'confirmed', 'cancelled', 'expired', 'postponed'] })
-    status: 'pending' | 'confirmed' | 'cancelled' | 'expired' | 'postponed';
+    status: bookingTypes.BookingStatus
 
     @ManyToOne(() => UserEntity, (user) => user.bookings)
     user: UserEntity;

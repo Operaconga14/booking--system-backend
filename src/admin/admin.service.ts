@@ -12,11 +12,16 @@ import { RemoveAdminDto } from './dto/remove-admin.dto';
 import { CreateAvailabilityDto } from './dto/create-availability.dto';
 import { AvailabilityEntity } from 'src/booking/entities/availability.entity';
 import { UpdateAvailabilityDto } from './dto/update-availability.dto';
+import { UpdateBookingDto } from 'src/booking/dto/update-booking.dto';
+import { UpdateBookingStatusDto } from './dto/update-booking-status.dto';
+import { AdminUpdateDto } from './dto/admin-update.dto';
+import { BookingEntity } from 'src/booking/entities/booking.entity';
 
 @Injectable()
 export class AdminService {
   @InjectRepository(UserEntity) private readonly userRepo: Repository<UserEntity>
   @InjectRepository(AvailabilityEntity) private readonly availabilityRepo: Repository<AvailabilityEntity>
+  @InjectRepository(BookingEntity) private readonly bookingRepo: Repository<BookingEntity>
 
   constructor(
     private readonly passwordService: PasswordUtilsService,
@@ -281,4 +286,105 @@ export class AdminService {
    * ----------------------------------------------------------
    */
 
+  async getAllBookings() {
+    try {
+      const bookings = await this.bookingRepo.find()
+
+      if (bookings.length <= 0)
+        throw new NotFoundException('No bookings created')
+
+      return bookings
+    } catch (error) {
+      throw new InternalServerErrorException(error)
+    }
+  }
+
+  async getBookingById(id: string) {
+    try {
+      const booking = await this.bookingRepo.findOne({ where: { id: parseInt(id) } })
+
+      if (!booking)
+        throw new NotFoundException('Booking not found')
+
+      return booking
+    } catch (error) {
+      throw new InternalServerErrorException(error)
+    }
+  }
+
+  async getBookingByUserId(id: string) {
+    try {
+      const booking = await this.bookingRepo.findOne({ where: { userId: parseInt(id) } })
+
+      if (!booking)
+        throw new NotFoundException('Booking not found')
+
+      return booking
+    } catch (error) {
+      throw new InternalServerErrorException(error)
+    }
+  }
+
+  async updateBookingStatus(id: string, updateBookingStatusDto: UpdateBookingStatusDto) {
+    try {
+      const booking = await this.bookingRepo.findOne({ where: { id: parseInt(id) } })
+
+      if (!booking)
+        throw new NotFoundException('Booking not found')
+
+      booking.status = updateBookingStatusDto.status
+      await this.bookingRepo.save(booking)
+
+      // TODO: Send email to the admin
+      return { message: 'Booking status updated successfully' }
+    } catch (error) {
+      throw new InternalServerErrorException(error)
+    }
+  }
+
+  async deleteBooking(id: string) {
+    try {
+      const booking = await this.bookingRepo.findOne({ where: { id: parseInt(id) } })
+
+      if (!booking)
+        throw new NotFoundException('Booking not found')
+
+      await this.bookingRepo.remove(booking)
+
+      // TODO: Send email to the admin
+      return { message: 'Booking deleted successfully' }
+    } catch (error) {
+      throw new InternalServerErrorException(error)
+    }
+  }
+
+
+  /**
+   * -----------------------------------------------------------
+   *              USER MANAGMENT
+   * -----------------------------------------------------------
+   */
+
+  async getAllUsers() { }
+
+  async getUserById(id: string) { }
+
+  async getUserByEmail(email: string) { }
+
+  async getUserByName(name: string) { }
+
+  async deleteUser(id: string) { }
+
+
+  /**
+   * -----------------------------------------------------------
+   *              PERSONAL ADMIN ACCOUNT MANAGMENT
+   * -----------------------------------------------------------
+   */
+
+  async getDetails(req: any) { }
+
+  async updateAccount(req: any, updateAccountDto: AdminUpdateDto) { }
+
+  async deleteAccount(req: any) { }
 }

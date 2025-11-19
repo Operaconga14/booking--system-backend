@@ -5,5 +5,8 @@ export class AdminUpdateDto {
     name: string
 
     @IsOptional()
+    email: string
+
+    @IsOptional()
     role: string
 }
