@@ -39,26 +39,34 @@ async function bootstrap() {
 
   // Generate and setup Swagger documentation at /docs endpoint
   const document = SwaggerModule.createDocument(app, swaggerConfig);
-  const isProd = config.get('NODE_ENV') === 'production';
 
-  // JSON route
-  app.use(`/${prefix ? prefix + '/' : ''}docs-json`, (req, res) => {
-    res.json(document);
-  });
+  SwaggerModule.setup('docs', app, document);  // <-- UI ONLY (no JSON URL override)
 
-  SwaggerModule.setup(`docs`, app, document, {
-    swaggerOptions: {
-      url: isProd
-        ? `${prefix ? prefix + '/' : ''}docs-json`
-        : `/${prefix ? prefix + '/' : ''}docs-json`,
-    },
-  });
+  // ---- GLOBAL PREFIX ----
+  const apiPrefix = config.get('API_PREFIX') ?? '';
+  if (apiPrefix) app.setGlobalPrefix(apiPrefix);
 
+  // ---- CORS FIX ----
+  // app.enableCors({
+  //   origin: [
+  //     "http://127.0.0.1:5500",
+  //     "http://localhost:3000",
+  //     "http://localhost:4200",
+  //     /\.vercel\.app$/,     // <-- Allows ALL your Vercel frontend domains
+  //   ],
+  //   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  //   credentials: true,
+  // });
 
 
   // Enable CORS for specified origin(s)
   app.enableCors({
-    origin: true,        // Allow all origins dynamically
+    origin: [
+      "http://127.0.0.1:5500",
+      "http://localhost:3000",
+      "http://localhost:4200",
+      /\.vercel\.app$/,     // <-- Allows ALL your Vercel frontend domains
+    ],
     credentials: true,   // allow Authorization header
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     allowedHeaders: 'Content-Type, Accept, Authorization, X-Requested-With',
