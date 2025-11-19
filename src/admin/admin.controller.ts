@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, InternalServerErrorException, BadRequestException } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { AdminRegisterDto } from './dto/admin-register.dto';
 import { AdminLoginDto } from './dto/admin-login.dto';
@@ -11,9 +11,13 @@ import { RemoveAdminDto } from './dto/remove-admin.dto';
 import { CreateAvailabilityDto } from './dto/create-availability.dto';
 import { UpdateAvailabilityDto } from './dto/update-availability.dto';
 import { UpdateBookingStatusDto } from './dto/update-booking-status.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { UserEntity } from 'src/user/entities/user.entity';
+import { In, Repository } from 'typeorm';
 
 @Controller('admin')
 export class AdminController {
+  @InjectRepository(UserEntity) private readonly userRepo: Repository<UserEntity>
   constructor(private readonly adminService: AdminService) { }
 
 
@@ -158,6 +162,40 @@ export class AdminController {
    *               USER MANAGMENT
    * --------------------------------------------------------
    */
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles('admin', 'ceo', 'manager', 'receptionist')
+  @Get('all-users')
+  async getAllUsers() {
+    return this.adminService.getAllUsers()
+  }
+
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles('admin', 'ceo', 'manager', 'receptionist')
+  @Get('user-by-id/:id')
+  getUserById(@Param('id') id: string) {
+    return this.adminService.getUserById(id)
+  }
+
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles('admin', 'ceo', 'manager', 'receptionist')
+  @Get('user-by-email/:email')
+  getUserByEmail(@Param('email') email: string) {
+    return this.adminService.getUserByEmail(email)
+  }
+
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles('admin', 'ceo', 'manager', 'receptionist')
+  @Get('user-by-name/:name')
+  getUserByName(@Param('name') name: string) {
+    return this.adminService.getUserByName(name)
+  }
+
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles('admin', 'ceo', 'manager', 'receptionist')
+  @Delete('delete-user/:id')
+  deleteUser(@Param('id') id: string) {
+    return this.adminService.deleteUser(id)
+  }
 
 
 

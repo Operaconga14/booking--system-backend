@@ -285,6 +285,10 @@ export class AdminService {
    * ----------------------------------------------------------
    */
 
+  /**
+   * Get all bookings
+   * @returns - all bookings or error message
+   */
   async getAllBookings() {
     try {
       const bookings = await this.bookingRepo.find()
@@ -298,6 +302,11 @@ export class AdminService {
     }
   }
 
+  /**
+   * Get booking by id
+   * @param id - booking id
+   * @returns - booking or error message
+   */
   async getBookingById(id: string) {
     try {
       const booking = await this.bookingRepo.findOne({ where: { id: parseInt(id) } })
@@ -311,6 +320,11 @@ export class AdminService {
     }
   }
 
+  /**
+   * Get booking by user id
+   * @param id - user id
+   * @returns - booking or error message
+   */
   async getBookingByUserId(id: string) {
     try {
       const booking = await this.bookingRepo.findOne({ where: { userId: parseInt(id) } })
@@ -324,6 +338,12 @@ export class AdminService {
     }
   }
 
+  /**
+   * Update booking status
+   * @param id - booking id
+   * @param updateBookingStatusDto - booking status
+   * @returns - success or error message
+   */
   async updateBookingStatus(id: string, updateBookingStatusDto: UpdateBookingStatusDto) {
     try {
       const booking = await this.bookingRepo.findOne({ where: { id: parseInt(id) } })
@@ -341,6 +361,11 @@ export class AdminService {
     }
   }
 
+  /**
+   * Delete booking
+   * @param id - booking id
+   * @returns - success or error message
+   */
   async deleteBooking(id: string) {
     try {
       const booking = await this.bookingRepo.findOne({ where: { id: parseInt(id) } })
@@ -364,15 +389,97 @@ export class AdminService {
    * -----------------------------------------------------------
    */
 
-  async getAllUsers() { }
+  /**
+   * Get all users
+   * @returns - all registered users or client error message
+   */
+  async getAllUsers() {
+    try {
+      const users = await this.userRepo.find({ where: { role: In(['user']) }, select: ['id', 'name', 'email'] })
 
-  async getUserById(id: string) { }
+      if (!users)
+        throw new BadRequestException('No users found')
 
-  async getUserByEmail(email: string) { }
+      return users
+    } catch (error) {
+      throw new InternalServerErrorException(error)
+    }
+  }
 
-  async getUserByName(name: string) { }
+  /**
+   * Get user by id
+   * @param id - user id
+   * @returns - user or error message
+   */
+  async getUserById(id: string) {
+    try {
+      const user = await this.userRepo.findOne({ where: { id: parseInt(id) }, select: ['id', 'name', 'email', 'createdAt', 'updatedAt'] })
 
-  async deleteUser(id: string) { }
+      if (!user)
+        throw new NotFoundException('User not found')
+
+      return user
+    } catch (error) {
+      throw new InternalServerErrorException(error)
+    }
+  }
+
+  /**
+   * Get user by email
+   * @param email - user email
+   * @returns - user or error message
+   */
+  async getUserByEmail(email: string) {
+    try {
+      const user = await this.userRepo.findOne({ where: { email: email }, select: ['id', 'name', 'email', 'createdAt', 'updatedAt'] })
+
+      if (!user)
+        throw new NotFoundException('User not found')
+
+      return user
+    } catch (error) {
+      throw new InternalServerErrorException(error)
+    }
+  }
+
+  /**
+   * Get user by name
+   * @param name - user name
+   * @returns - user or error message
+   */
+  async getUserByName(name: string) {
+    try {
+      const user = await this.userRepo.findOne({ where: { name: name }, select: ['id', 'name', 'email', 'createdAt', 'updatedAt'] })
+
+      if (!user)
+        throw new NotFoundException('User not found')
+
+      return user
+    } catch (error) {
+      throw new InternalServerErrorException(error)
+    }
+  }
+
+  /**
+   * Delete user
+   * @param id - user id
+   * @returns - success or error message
+   */
+  async deleteUser(id: string) {
+    try {
+      const user = await this.userRepo.findOne({ where: { id: parseInt(id) } })
+
+      if (!user)
+        throw new NotFoundException('User not found')
+
+      await this.userRepo.remove(user)
+
+      // TODO: Send email to the admin
+      return { message: 'User deleted successfully' }
+    } catch (error) {
+      throw new InternalServerErrorException(error)
+    }
+  }
 
 
   /**
@@ -381,7 +488,9 @@ export class AdminService {
    * -----------------------------------------------------------
    */
 
-  async getDetails(req: any) { }
+  async getDetails(req: any) {
+
+  }
 
   async updateAccount(req: any, updateAccountDto: AdminUpdateDto) { }
 
