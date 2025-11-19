@@ -40,23 +40,15 @@ async function bootstrap() {
   // Generate and setup Swagger documentation at /docs endpoint
   const document = SwaggerModule.createDocument(app, swaggerConfig);
 
-  SwaggerModule.setup('docs', app, document);  // <-- UI ONLY (no JSON URL override)
 
-  // ---- GLOBAL PREFIX ----
-  const apiPrefix = config.get('API_PREFIX') ?? '';
-  if (apiPrefix) app.setGlobalPrefix(apiPrefix);
+  SwaggerModule.setup('docs', app, document, {
+    swaggerOptions: {
+      url: '/docs-json',  // explicitly point to your JSON endpoint
+    }
+  });
 
-  // ---- CORS FIX ----
-  // app.enableCors({
-  //   origin: [
-  //     "http://127.0.0.1:5500",
-  //     "http://localhost:3000",
-  //     "http://localhost:4200",
-  //     /\.vercel\.app$/,     // <-- Allows ALL your Vercel frontend domains
-  //   ],
-  //   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  //   credentials: true,
-  // });
+  // SwaggerModule.setup('docs', app, document);  // <-- UI ONLY (no JSON URL override)
+
 
 
   // Enable CORS for specified origin(s)
