@@ -12,7 +12,6 @@ import { RemoveAdminDto } from './dto/remove-admin.dto';
 import { CreateAvailabilityDto } from './dto/create-availability.dto';
 import { AvailabilityEntity } from 'src/booking/entities/availability.entity';
 import { UpdateAvailabilityDto } from './dto/update-availability.dto';
-import { UpdateBookingDto } from 'src/booking/dto/update-booking.dto';
 import { UpdateBookingStatusDto } from './dto/update-booking-status.dto';
 import { AdminUpdateDto } from './dto/admin-update.dto';
 import { BookingEntity } from 'src/booking/entities/booking.entity';
