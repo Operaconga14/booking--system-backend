@@ -20,7 +20,6 @@ async function bootstrap() {
     .setTitle('Booking System API')
     .setDescription('Booking System API')
     .setVersion('1.0')
-    .addServer("https://bookingsystemapi.vercel.app/api/v1")
     .addOAuth2({
       type: 'http',
       scheme: 'bearer',
@@ -33,7 +32,17 @@ async function bootstrap() {
 
   // Generate and setup Swagger documentation at /docs endpoint
   const document = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('docs', app, document);
+  const isProd = config.get('NODE_ENV') === 'production';
+
+  app.use('/docs-json', (req, res) => {
+    res.json(document);
+  });
+
+  SwaggerModule.setup('docs', app, document, {
+    swaggerOptions: {
+      url: isProd ? '/api/docs-json' : '/docs-json'
+    }
+  });
 
 
   // Set global API prefix from environment configuration (e.g., 'api/v1')
