@@ -1,3 +1,4 @@
+import { BookingEntity } from "src/booking/entities/booking.entity";
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity('users')
@@ -34,7 +35,7 @@ export class UserEntity {
     @Column({ type: 'timestamp', nullable: true })
     deletedAt: Date;
 
-    // /** One-to-many relationship with bookings */
-    // @OneToMany(() => BookingEntity, (booking) => booking.user)
-    // bookings: BookingEntity[];
+    /** One-to-many relationship with bookings */
+    @OneToMany(() => BookingEntity, (booking) => booking.user)
+    bookings: BookingEntity[];
 }

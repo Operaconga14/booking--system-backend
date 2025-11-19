@@ -7,6 +7,10 @@ import { UserEntity } from './user/entities/user.entity';
 import { PasswordUtilsService } from './utils/password.utils.service';
 import { TokenUtilsService } from './utils/token.utils.service';
 import { AdminModule } from './admin/admin.module';
+import { BookingModule } from './booking/booking.module';
+import { TransactionModule } from './transaction/transaction.module';
+import { BookingEntity } from './booking/entities/booking.entity';
+import { AvailabilityEntity } from './booking/entities/availability.entity';
 
 @Module({
   imports: [
@@ -24,7 +28,7 @@ import { AdminModule } from './admin/admin.module';
         username: config.get('DB_USERNAME'),
         password: config.get('DB_PASSWORD'),
         database: config.get('DB_NAME'),
-        entities: [UserEntity],
+        entities: [UserEntity, BookingEntity, AvailabilityEntity],
         autoLoadEntities: true,
         ssl: { rejectUnauthorized: false },
         extra: {
@@ -34,7 +38,9 @@ import { AdminModule } from './admin/admin.module';
     }),
     AuthModule,
     UserModule,
-    AdminModule
+    AdminModule,
+    BookingModule,
+    TransactionModule
   ],
   controllers: [],
   providers: [PasswordUtilsService, TokenUtilsService],

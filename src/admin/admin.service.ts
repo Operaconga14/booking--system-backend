@@ -100,6 +100,11 @@ export class AdminService {
     }
   }
 
+  /**
+   * Remove admin
+   * @param removeAdminDto - admin name
+   * @returns - success or error message
+   */
   async removeAdmin(removeAdminDto: RemoveAdminDto) {
     try {
       const admin = await this.userRepo.findOne({ where: { name: removeAdminDto.name, role: In(['admin', 'ceo', 'manager', 'receptionist']) } })
@@ -117,7 +122,7 @@ export class AdminService {
   }
 
   /**
-   * 
+   * Invite admin
    * @param inviteAdminDto - new admin email and role
    * @returns - success or error message
    */
@@ -136,14 +141,20 @@ export class AdminService {
     }
   }
 
-  async changeAdminRole(changeAdminRole: ChangeAdminRoleDto) {
+
+  /**
+   * Change admin role
+   * @param changeAdminRoleDto - admin name and new role
+   * @returns - success or error message
+   */
+  async changeAdminRole(changeAdminRoleDto: ChangeAdminRoleDto) {
     try {
-      const admin = await this.userRepo.findOne({ where: { name: changeAdminRole.name, role: In(['admin', 'ceo', 'manager', 'receptionist']) } })
+      const admin = await this.userRepo.findOne({ where: { name: changeAdminRoleDto.name, role: In(['admin', 'ceo', 'manager', 'receptionist']) } })
 
       if (!admin)
         throw new BadRequestException('Admin not found')
 
-      admin.role = changeAdminRole.role
+      admin.role = changeAdminRoleDto.role
 
       // TODO: Send email to the admin and the changed admin
 
