@@ -15,6 +15,13 @@ async function bootstrap() {
   // Get the configuration service to access environment variables
   const config = app.get(ConfigService);
 
+  // Set global API prefix from environment configuration (e.g., 'api/v1')
+  const prefix = config.get('API_PREFIX') || '';
+
+  if (prefix) {
+    app.setGlobalPrefix(prefix);
+  }
+
   // Configure Swagger/OpenAPI documentation
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Booking System API')
@@ -34,23 +41,27 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   const isProd = config.get('NODE_ENV') === 'production';
 
-  app.use('/docs-json', (req, res) => {
+  // JSON route
+  app.use(`/${prefix ? prefix + '/' : ''}docs-json`, (req, res) => {
     res.json(document);
   });
 
-  SwaggerModule.setup('docs', app, document, {
+  SwaggerModule.setup(`docs`, app, document, {
     swaggerOptions: {
-      url: isProd ? '/api/docs-json' : '/docs-json'
-    }
+      url: isProd
+        ? `${prefix ? prefix + '/' : ''}docs-json`
+        : `/${prefix ? prefix + '/' : ''}docs-json`,
+    },
   });
 
 
-  // Set global API prefix from environment configuration (e.g., 'api/v1')
-  app.setGlobalPrefix(`${config.get('API_PREFIX')}`);
 
   // Enable CORS for specified origin(s)
   app.enableCors({
-    origin: ["http://127.0.0.1:5500"]
+    origin: true,        // Allow all origins dynamically
+    credentials: true,   // allow Authorization header
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    allowedHeaders: 'Content-Type, Accept, Authorization, X-Requested-With',
   });
 
   app.useGlobalPipes(new ValidationPipe({
